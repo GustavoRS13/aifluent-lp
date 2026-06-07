@@ -1,21 +1,5 @@
-"use client";
-
-import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      delay: i * 0.1,
-      ease: [0.22, 1, 0.36, 1] as const,
-    },
-  }),
-};
 
 const stats = [
   { k: "IA", v: "aplicada ao negócio" },
@@ -23,54 +7,33 @@ const stats = [
   { k: "Integração", v: "de sistemas" },
 ];
 
+// Server component: o conteúdo do hero é renderizado visível no primeiro paint
+// (sem animação que esconda o texto), preservando um bom LCP. As animações de
+// entrada ficam nas seções seguintes (on-scroll, via Framer Motion).
 export function Hero() {
   return (
     <section className="hero-mesh relative overflow-hidden text-white">
       <div className="absolute inset-0 bg-grid-dark opacity-60" aria-hidden />
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:gap-8 lg:px-8 lg:py-28">
         <div>
-          <motion.span
-            custom={0}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/80"
-          >
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wide text-white/80">
             <Sparkles className="size-3.5 text-brand-cyan" />
             Tecnologia, IA &amp; Educação Corporativa
-          </motion.span>
+          </span>
 
-          <motion.h1
-            custom={1}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-balance sm:text-5xl lg:text-6xl"
-          >
+          <h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-balance sm:text-5xl lg:text-6xl">
             Inteligência artificial que dá{" "}
             <span className="brand-gradient-text">fluência</span> à sua empresa
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            custom={2}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="mt-6 max-w-xl text-lg leading-relaxed text-white/70"
-          >
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/70">
             A AIFLUENT conecta educação corporativa, inteligência artificial,
             automação de processos e integração de sistemas — transformando
             conhecimento e dados em produtividade, com segurança e conformidade
             à LGPD.
-          </motion.p>
+          </p>
 
-          <motion.div
-            custom={3}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="mt-9 flex flex-col gap-3 sm:flex-row"
-          >
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button variant="brand" size="xl" render={<a href="#contato" />}>
               Solicitar demonstração
               <ArrowRight className="size-4" />
@@ -83,31 +46,19 @@ export function Hero() {
             >
               Falar com especialista
             </Button>
-          </motion.div>
+          </div>
 
-          <motion.dl
-            custom={4}
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            className="mt-12 grid max-w-md grid-cols-3 gap-6"
-          >
+          <dl className="mt-12 grid max-w-md grid-cols-3 gap-6">
             {stats.map((s) => (
               <div key={s.k}>
                 <dt className="text-base font-semibold text-white">{s.k}</dt>
                 <dd className="text-sm text-white/60">{s.v}</dd>
               </div>
             ))}
-          </motion.dl>
+          </dl>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.94 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="relative hidden lg:block"
-          aria-hidden
-        >
+        <div className="relative hidden lg:block" aria-hidden>
           <div className="animate-float relative mx-auto aspect-square w-full max-w-md">
             <div className="brand-gradient absolute inset-0 rounded-[2rem] opacity-20 blur-2xl" />
             <div className="card-ring absolute inset-6 rounded-[1.75rem] border border-white/10 bg-ink-soft/80 p-6 backdrop-blur">
@@ -130,7 +81,7 @@ export function Hero() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
