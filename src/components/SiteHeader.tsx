@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { Button } from "./ui/button";
 import { nav } from "@/lib/site";
 
 export function SiteHeader() {
@@ -19,7 +21,7 @@ export function SiteHeader() {
     <header
       className={`sticky top-0 z-50 border-b transition-colors ${
         scrolled
-          ? "border-slate-200 bg-white/85 backdrop-blur-md"
+          ? "border-border bg-white/85 backdrop-blur-md"
           : "border-transparent bg-white/60 backdrop-blur"
       }`}
     >
@@ -27,25 +29,25 @@ export function SiteHeader() {
         <Logo priority />
 
         <nav
-          className="hidden items-center gap-8 md:flex"
+          className="hidden items-center gap-7 lg:flex"
           aria-label="Navegação principal"
         >
           {nav.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+              className="text-sm font-medium text-muted-foreground transition-colors hover:text-ink"
             >
               {item.label}
             </a>
           ))}
-          <a
-            href="#contato"
-            className="brand-gradient rounded-full px-5 py-2 text-sm font-semibold text-white shadow-sm transition-transform hover:scale-[1.03]"
-          >
-            Fale com a gente
-          </a>
         </nav>
+
+        <div className="hidden items-center gap-3 lg:flex">
+          <Button variant="brand" size="pill" render={<a href="#contato" />}>
+            Solicitar demonstração
+          </Button>
+        </div>
 
         <button
           type="button"
@@ -53,29 +55,16 @@ export function SiteHeader() {
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Fechar menu" : "Abrir menu"}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100 md:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink hover:bg-muted lg:hidden"
         >
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            {open ? (
-              <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
-            ) : (
-              <path d="M3 6h18M3 12h18M3 18h18" strokeLinecap="round" />
-            )}
-          </svg>
+          {open ? <X className="size-5" /> : <Menu className="size-5" />}
         </button>
       </div>
 
       {open && (
         <div
           id="mobile-menu"
-          className="border-t border-slate-200 bg-white md:hidden"
+          className="border-t border-border bg-white lg:hidden"
         >
           <nav
             className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3"
@@ -86,18 +75,19 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-base font-medium text-slate-700 hover:bg-slate-50"
+                className="rounded-lg px-3 py-2.5 text-base font-medium text-ink hover:bg-muted"
               >
                 {item.label}
               </a>
             ))}
-            <a
-              href="#contato"
-              onClick={() => setOpen(false)}
-              className="brand-gradient mt-2 rounded-full px-4 py-2.5 text-center text-base font-semibold text-white"
+            <Button
+              variant="brand"
+              size="pill"
+              className="mt-2 w-full"
+              render={<a href="#contato" onClick={() => setOpen(false)} />}
             >
-              Fale com a gente
-            </a>
+              Solicitar demonstração
+            </Button>
           </nav>
         </div>
       )}

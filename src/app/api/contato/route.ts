@@ -1,23 +1,33 @@
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
+import { site } from "@/lib/site";
 
 // Handler do formulário de contato institucional.
-// Hoje apenas valida e registra a intenção. Para entrega real de e-mail,
-// integre um provedor (ex.: Resend) lendo a chave de variável de ambiente —
-// nunca commite segredos. Veja o README (seção "Formulário de contato").
+// Envia e-mail via Resend quando RESEND_API_KEY estiver configurada (na Vercel).
+// Sem a chave, valida e registra o lead sem quebrar o formulário — útil em preview.
+// Nunca commite segredos: a chave vem de variável de ambiente. Veja env.example.
 
 export const runtime = "nodejs";
 
 type Payload = {
   nome?: string;
+  empresa?: string;
   email?: string;
   telefone?: string;
-  instituicao?: string;
   mensagem?: string;
   consent?: string;
   website?: string; // honeypot
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
 
 export async function POST(request: Request) {
   let body: Payload;
@@ -35,6 +45,8 @@ export async function POST(request: Request) {
   const nome = body.nome?.trim();
   const email = body.email?.trim();
   const mensagem = body.mensagem?.trim();
+  const empresa = body.empresa?.trim() ?? "";
+  const telefone = body.telefone?.trim() ?? "";
 
   if (!nome || !email || !mensagem) {
     return NextResponse.json(
@@ -52,14 +64,45 @@ export async function POST(request: Request) {
     );
   }
 
-  // TODO: integrar envio de e-mail / CRM.
-  // Ex.: await sendEmail({ to: process.env.CONTACT_INBOX, ... })
-  // Log estruturado, sem expor dados sensíveis em produção.
-  console.info("contato.recebido", {
-    nome,
-    email,
-    temTelefone: Boolean(body.telefone),
-  });
+  const apiKey = process.env.RESEND_API_KEY;
+  const to = process.env.CONTACT_INBOX ?? site.contact.email;
+  // Remetente: precisa ser um domínio verificado no Resend. Configurável por env.
+  const from = process.env.CONTACT_FROM ?? "AIFLUENT <contato@aifluent.com.br>";
 
-  return NextResponse.json({ ok: true });
+  if (!apiKey) {
+    // Sem chave configurada: não falha o formulário, apenas registra.
+    console.warn("contato.sem_resend_key", { nome, email, empresa });
+    return NextResponse.json({ ok: true, delivered: false });
+  }
+
+  try {
+    const resend = new Resend(apiKey);
+    const html = `
+      <h2>Novo contato — ${escapeHtml(site.name)}</h2>
+      <p><strong>Nome:</strong> ${escapeHtml(nome)}</p>
+      <p><strong>Empresa:</strong> ${escapeHtml(empresa) || "—"}</p>
+      <p><strong>E-mail:</strong> ${escapeHtml(email)}</p>
+      <p><strong>Telefone:</strong> ${escapeHtml(telefone) || "—"}</p>
+      <p><strong>Mensagem:</strong></p>
+      <p>${escapeHtml(mensagem).replace(/\n/g, "<br/>")}</p>
+    `;
+
+    const { error } = await resend.emails.send({
+      from,
+      to: [to],
+      replyTo: email,
+      subject: `Novo contato de ${nome}${empresa ? ` (${empresa})` : ""}`,
+      html,
+    });
+
+    if (error) {
+      console.error("contato.resend_error", error);
+      return NextResponse.json({ error: "Falha ao enviar." }, { status: 502 });
+    }
+
+    return NextResponse.json({ ok: true, delivered: true });
+  } catch (err) {
+    console.error("contato.exception", err);
+    return NextResponse.json({ error: "Erro interno." }, { status: 500 });
+  }
 }

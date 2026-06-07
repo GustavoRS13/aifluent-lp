@@ -1,9 +1,12 @@
 import { SiteHeader } from "@/components/SiteHeader";
-import { Hero } from "@/components/Hero";
-import { Pillars } from "@/components/Pillars";
-import { Solutions } from "@/components/Solutions";
-import { Differentiators } from "@/components/Differentiators";
-import { About } from "@/components/About";
+import { Hero } from "@/components/sections/Hero";
+import { QuemSomos } from "@/components/sections/QuemSomos";
+import { Solucoes } from "@/components/sections/Solucoes";
+import { Diferenciais } from "@/components/sections/Diferenciais";
+import { Processo } from "@/components/sections/Processo";
+import { Parceiros } from "@/components/sections/Parceiros";
+import { FAQ } from "@/components/sections/FAQ";
+import { CTAFinal } from "@/components/sections/CTAFinal";
 import { ContactSection } from "@/components/ContactSection";
 import { SiteFooter } from "@/components/SiteFooter";
 import { site } from "@/lib/site";
@@ -19,6 +22,13 @@ export default function Home() {
     description: site.description,
     email: site.contact.email,
     areaServed: "BR",
+    sameAs: [site.social.linkedin],
+    knowsAbout: [
+      "Inteligência Artificial",
+      "Automação de Processos",
+      "Integração de Sistemas",
+      "Educação Corporativa",
+    ],
   };
 
   return (
@@ -30,10 +40,13 @@ export default function Home() {
       <SiteHeader />
       <main className="flex-1">
         <Hero />
-        <Pillars />
-        <Solutions />
-        <Differentiators />
-        <About />
+        <QuemSomos />
+        <Solucoes />
+        <Diferenciais />
+        <Processo />
+        <Parceiros />
+        <FAQ />
+        <CTAFinal />
         <ContactSection />
       </main>
       <SiteFooter />

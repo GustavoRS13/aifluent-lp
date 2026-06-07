@@ -3,10 +3,10 @@
 
 export const site = {
   name: "AIFLUENT",
-  tagline: "Tecnologia que dá fluência à educação",
+  tagline: "Inteligência artificial e educação que impulsionam empresas",
   description:
-    "A AIFLUENT é uma empresa de tecnologia focada em educação, especializada no desenvolvimento de funções integradas de sistemas, automação de processos e inteligência artificial aplicada ao ensino.",
-  // Domínio de produção — atualize após apontar o registro.br para a Vercel.
+    "A AIFLUENT é uma empresa de tecnologia focada em educação corporativa, inteligência artificial, automação de processos e integração de sistemas. Conectamos educação, IA e produtividade empresarial.",
+  // Domínio de produção.
   url: "https://aifluent.com.br",
   locale: "pt-BR",
   contact: {
@@ -20,7 +20,7 @@ export const site = {
     linkedin: "https://www.linkedin.com/company/aifluent",
     instagram: "https://www.instagram.com/aifluent",
   },
-  // Dados para a Política de Privacidade (LGPD). Ajuste com os dados oficiais da empresa.
+  // Dados para documentos legais (LGPD). Ajuste com os dados oficiais da empresa.
   legal: {
     companyName: "AIFLUENT Tecnologia",
     cnpj: "00.000.000/0001-00",
@@ -29,8 +29,10 @@ export const site = {
 } as const;
 
 export const nav = [
+  { label: "Quem Somos", href: "#quem-somos" },
   { label: "Soluções", href: "#solucoes" },
   { label: "Diferenciais", href: "#diferenciais" },
-  { label: "Sobre", href: "#sobre" },
+  { label: "Processo", href: "#processo" },
+  { label: "FAQ", href: "#faq" },
   { label: "Contato", href: "#contato" },
 ] as const;
