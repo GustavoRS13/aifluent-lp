@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AIFLUENT — Landing Page Institucional
 
-## Getting Started
+Site institucional da **AIFLUENT**, empresa de tecnologia focada em educação,
+especializada no desenvolvimento de funções integradas de sistemas, automação de
+processos e inteligência artificial aplicada ao ensino.
 
-First, run the development server:
+Construído com **Next.js 16 (App Router)**, **React 19**, **TypeScript** e
+**Tailwind CSS v4**. Design baseado na identidade visual do logo (gradiente
+ciano → azul → roxo) e em conformidade com a **LGPD**.
+
+## Stack
+
+- Next.js 16 (App Router, Turbopack)
+- TypeScript estrito
+- Tailwind CSS v4
+- Deploy: Vercel
+
+## Desenvolvimento
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # build de produção
+npm run start    # serve o build
+npm run lint     # eslint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Estrutura
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├─ app/
+│  ├─ layout.tsx           # metadata/SEO, fonte, banner de cookies
+│  ├─ page.tsx             # composição das seções da LP
+│  ├─ privacidade/         # Política de Privacidade (LGPD)
+│  ├─ api/contato/route.ts # endpoint do formulário de contato
+│  ├─ sitemap.ts / robots.ts
+│  └─ globals.css          # design tokens da marca + utilitários
+├─ components/             # Header, Hero, Soluções, Diferenciais, etc.
+└─ lib/site.ts             # conteúdo central (copy, contato, dados legais)
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Conteúdo e identidade
 
-## Learn More
+Toda a copy institucional, dados de contato e informações legais ficam
+centralizados em [`src/lib/site.ts`](src/lib/site.ts). Ajuste ali telefone,
+e-mail, CNPJ e e-mail do encarregado (DPO) com os dados oficiais.
 
-To learn more about Next.js, take a look at the following resources:
+O logotipo está em `public/aifluent-logo.jpeg`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## LGPD
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Banner de consentimento de cookies (somente cookies essenciais por padrão).
+- Página de **Política de Privacidade** em `/privacidade`.
+- Checkbox de consentimento obrigatório no formulário de contato.
+- Nenhum rastreador de terceiros incluído por padrão.
 
-## Deploy on Vercel
+## Formulário de contato
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+O endpoint `POST /api/contato` valida os dados e o consentimento. **Ainda não
+envia e-mail** — para entrega real, integre um provedor (ex.: [Resend](https://resend.com))
+em `src/app/api/contato/route.ts`, lendo a chave de uma variável de ambiente
+(`CONTACT_INBOX`, `RESEND_API_KEY`). Nunca commite segredos. Veja `.env.example`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+
+Deploy contínuo via Vercel a cada push na branch `main`.
