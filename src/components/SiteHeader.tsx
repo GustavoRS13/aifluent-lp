@@ -45,7 +45,7 @@ export function SiteHeader() {
 
         <div className="hidden items-center gap-3 lg:flex">
           <Button variant="brand" size="pill" render={<a href="#contato" />}>
-            Solicitar demonstração
+            Agendar conversa
           </Button>
         </div>
 
@@ -86,7 +86,7 @@ export function SiteHeader() {
               className="mt-2 w-full"
               render={<a href="#contato" onClick={() => setOpen(false)} />}
             >
-              Solicitar demonstração
+              Agendar conversa
             </Button>
           </nav>
         </div>

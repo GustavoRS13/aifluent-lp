@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 import { CookieConsent } from "@/components/CookieConsent";
+import { WhatsAppFab } from "@/components/WhatsAppFab";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,7 @@ export default function RootLayout({
     <html lang="pt-BR" className={`${geistSans.variable} h-full`}>
       <body className="flex min-h-full flex-col bg-white text-ink antialiased">
         {children}
+        <WhatsAppFab />
         <CookieConsent />
       </body>
     </html>

@@ -22,7 +22,7 @@ export function CTAFinal() {
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Button variant="brand" size="xl" render={<a href="#contato" />}>
-                Solicitar demonstração
+                Agendar conversa
                 <ArrowRight className="size-4" />
               </Button>
               <Button

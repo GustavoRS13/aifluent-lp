@@ -74,7 +74,7 @@ export function Hero() {
 
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button variant="brand" size="xl" render={<a href="#contato" />}>
-              Solicitar demonstração
+              Agendar conversa
               <ArrowRight className="size-4" />
             </Button>
             <Button

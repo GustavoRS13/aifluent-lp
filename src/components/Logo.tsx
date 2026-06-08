@@ -1,10 +1,10 @@
-import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/lib/site";
 
+// `priority` é aceito por compatibilidade com chamadas existentes (não é
+// necessário: o logo é um SVG leve), por isso não é desestruturado aqui.
 export function Logo({
   className = "",
-  priority = false,
 }: {
   className?: string;
   priority?: boolean;
@@ -13,16 +13,21 @@ export function Logo({
     <Link
       href="/"
       aria-label={`${site.name} — página inicial`}
-      className={`inline-flex items-center ${className}`}
+      className={`inline-flex items-center gap-2.5 ${className}`}
     >
-      <Image
-        src="/aifluent-logo.jpeg"
-        alt={`Logotipo ${site.name}`}
-        width={680}
-        height={196}
-        priority={priority}
-        className="h-9 w-auto md:h-10"
+      {/* Símbolo "A" da marca — SVG transparente, sem quadrado branco */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo-a.svg"
+        alt=""
+        aria-hidden
+        width={342}
+        height={240}
+        className="h-10 w-auto md:h-11"
       />
+      <span className="text-xl font-bold tracking-tight text-ink">
+        AIFLUENT
+      </span>
     </Link>
   );
 }

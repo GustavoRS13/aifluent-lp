@@ -1,8 +1,7 @@
 import Link from "next/link";
-import { Mail } from "lucide-react";
-import { LinkedinIcon } from "@/components/icons/LinkedinIcon";
+import { Mail, MessageCircle } from "lucide-react";
 import { Logo } from "./Logo";
-import { nav, site } from "@/lib/site";
+import { nav, site, whatsappUrl } from "@/lib/site";
 
 export function SiteFooter() {
   const year = 2026;
@@ -16,24 +15,6 @@ export function SiteFooter() {
               Empresa de tecnologia focada em educação corporativa, inteligência
               artificial, automação de processos e integração de sistemas.
             </p>
-            <div className="mt-5 flex items-center gap-3">
-              <a
-                href={site.social.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn da AIFLUENT"
-                className="inline-flex size-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-brand-blue/40 hover:text-ink"
-              >
-                <LinkedinIcon className="size-4" />
-              </a>
-              <a
-                href={`mailto:${site.contact.email}`}
-                aria-label="Enviar e-mail"
-                className="inline-flex size-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:border-brand-blue/40 hover:text-ink"
-              >
-                <Mail className="size-4" />
-              </a>
-            </div>
           </div>
 
           <div>
@@ -59,20 +40,22 @@ export function SiteFooter() {
             <ul className="mt-4 space-y-2.5">
               <li>
                 <a
-                  href={`mailto:${site.contact.email}`}
-                  className="text-sm text-muted-foreground hover:text-ink"
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-ink"
                 >
-                  {site.contact.email}
+                  <MessageCircle className="size-4" />
+                  WhatsApp: {site.contact.whatsappLabel}
                 </a>
               </li>
               <li>
                 <a
-                  href={site.social.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-muted-foreground hover:text-ink"
+                  href={`mailto:${site.contact.email}`}
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-ink"
                 >
-                  LinkedIn
+                  <Mail className="size-4" />
+                  {site.contact.email}
                 </a>
               </li>
               <li>

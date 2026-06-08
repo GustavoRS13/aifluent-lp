@@ -9,29 +9,45 @@ export const site = {
   url: "https://aifluent.com.br",
   locale: "pt-BR",
   contact: {
-    email: "contato@aifluent.com.br",
-    // Número usado para o link do WhatsApp (apenas dígitos, com DDI).
-    whatsapp: "5511999999999",
-    whatsappLabel: "+55 (11) 99999-9999",
-    // Link do Calendly para agendamento de reunião.
-    calendly: "https://calendly.com/aifluent/reuniao",
+    // E-mail que recebe os leads do formulário e é exibido no site.
+    email: "aifluent935@gmail.com",
+    // WhatsApp oficial (apenas dígitos, com DDI) + rótulo de exibição.
+    whatsapp: "5511947423709",
+    whatsappLabel: "(11) 94742-3709",
     address: "São Paulo / SP — Brasil",
-  },
-  social: {
-    linkedin: "https://www.linkedin.com/company/aifluent",
-    instagram: "https://www.instagram.com/aifluent",
   },
   // Dados para documentos legais (LGPD). Ajuste com os dados oficiais da empresa.
   legal: {
     companyName: "AIFLUENT Tecnologia",
     cnpj: "00.000.000/0001-00",
-    dpoEmail: "privacidade@aifluent.com.br",
+    dpoEmail: "aifluent935@gmail.com",
   },
 } as const;
 
+// Mensagem padrão para o botão flutuante e "Falar com especialista".
 export const whatsappUrl = `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(
-  "Olá! Vim pelo site da AIFLUENT e gostaria de falar com um especialista.",
+  "Olá! Vim através do site da AIFLUENT e gostaria de falar com um especialista.",
 )}`;
+
+// Monta um link de WhatsApp com os dados do lead preenchidos no formulário.
+export function whatsappLeadUrl(data: {
+  nome?: string;
+  empresa?: string;
+  email?: string;
+  telefone?: string;
+  mensagem?: string;
+}) {
+  const texto = [
+    "Olá! Acabei de preencher o formulário do site.",
+    "",
+    `Nome: ${data.nome ?? ""}`,
+    `Empresa: ${data.empresa ?? ""}`,
+    `Email: ${data.email ?? ""}`,
+    `Telefone: ${data.telefone ?? ""}`,
+    `Mensagem: ${data.mensagem ?? ""}`,
+  ].join("\n");
+  return `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(texto)}`;
+}
 
 export const nav = [
   { label: "Quem Somos", href: "#quem-somos" },

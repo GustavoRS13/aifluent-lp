@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Mail, MessageCircle, CalendarClock } from "lucide-react";
+import { Check, Mail, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { LinkedinIcon } from "@/components/icons/LinkedinIcon";
-import { site, whatsappUrl } from "@/lib/site";
+import { site, whatsappUrl, whatsappLeadUrl } from "@/lib/site";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -18,28 +17,12 @@ const canais = [
     label: "WhatsApp",
     value: site.contact.whatsappLabel,
     href: whatsappUrl,
-    external: true,
-  },
-  {
-    icon: CalendarClock,
-    label: "Agendar reunião",
-    value: "Calendly",
-    href: site.contact.calendly,
-    external: true,
   },
   {
     icon: Mail,
     label: "E-mail",
     value: site.contact.email,
     href: `mailto:${site.contact.email}`,
-    external: false,
-  },
-  {
-    icon: LinkedinIcon,
-    label: "LinkedIn",
-    value: "/company/aifluent",
-    href: site.social.linkedin,
-    external: true,
   },
 ];
 
@@ -50,11 +33,11 @@ export function ContactSection() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form).entries());
+    const raw = Object.fromEntries(new FormData(form).entries());
 
-    if (data.website) return; // honeypot
+    if (raw.website) return; // honeypot
 
-    if (!data.consent) {
+    if (!raw.consent) {
       setStatus("error");
       setErrorMsg(
         "É necessário aceitar a Política de Privacidade para enviar.",
@@ -68,9 +51,20 @@ export function ContactSection() {
       const res = await fetch("/api/contato", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(raw),
       });
       if (!res.ok) throw new Error("request failed");
+
+      // Sucesso: abre o WhatsApp com os dados preenchidos (canal adicional).
+      const lead = {
+        nome: String(raw.nome ?? ""),
+        empresa: String(raw.empresa ?? ""),
+        email: String(raw.email ?? ""),
+        telefone: String(raw.telefone ?? ""),
+        mensagem: String(raw.mensagem ?? ""),
+      };
+      window.open(whatsappLeadUrl(lead), "_blank", "noopener,noreferrer");
+
       setStatus("success");
       form.reset();
     } catch {
@@ -92,8 +86,8 @@ export function ContactSection() {
             Vamos conversar sobre o seu projeto
           </h2>
           <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">
-            Escolha o canal de sua preferência ou envie uma mensagem. Nosso time
-            retorna com uma proposta de IA, automação, integração ou
+            Fale com a gente pelo WhatsApp, por e-mail ou envie uma mensagem.
+            Nosso time retorna com uma proposta de IA, automação, integração ou
             desenvolvimento sob medida.
           </p>
 
@@ -102,8 +96,8 @@ export function ContactSection() {
               <a
                 key={c.label}
                 href={c.href}
-                target={c.external ? "_blank" : undefined}
-                rel={c.external ? "noopener noreferrer" : undefined}
+                target={c.label === "WhatsApp" ? "_blank" : undefined}
+                rel={c.label === "WhatsApp" ? "noopener noreferrer" : undefined}
                 className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-brand-blue/40 hover:shadow-sm"
               >
                 <span className="brand-gradient inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-white">
@@ -132,7 +126,8 @@ export function ContactSection() {
                 Mensagem enviada!
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Obrigado pelo contato. Retornaremos em breve.
+                Recebemos o seu contato e abrimos o WhatsApp para agilizar a
+                conversa. Retornaremos em breve.
               </p>
             </div>
           ) : (

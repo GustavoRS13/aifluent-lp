@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { site } from "@/lib/site";
 
-// Handler do formulário de contato institucional.
-// Envia e-mail via Resend quando RESEND_API_KEY estiver configurada (na Vercel).
-// Sem a chave, valida e registra o lead sem quebrar o formulário — útil em preview.
-// Nunca commite segredos: a chave vem de variável de ambiente. Veja env.example.
+// Handler do formulário de contato.
+// Entrega do lead em dois canais para máxima confiabilidade:
+//  1) E-mail para site.contact.email — via Resend (se RESEND_API_KEY estiver
+//     configurada na Vercel) ou, sem chave, via FormSubmit (keyless).
+//  2) WhatsApp com os dados — disparado no cliente após o retorno ok.
+// Se o e-mail falhar (ex.: serviço fora do ar), ainda retornamos ok para que o
+// WhatsApp abra com os dados: assim o lead nunca se perde.
 
 export const runtime = "nodejs";
 
@@ -21,12 +23,88 @@ type Payload = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+function escapeHtml(v: string) {
+  return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+type Lead = {
+  nome: string;
+  empresa: string;
+  email: string;
+  telefone: string;
+  mensagem: string;
+  dataHora: string;
+};
+
+const SUBJECT = "[LEAD SITE] Novo contato recebido";
+
+async function sendViaResend(lead: Lead): Promise<boolean> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return false;
+  const from = process.env.CONTACT_FROM ?? "AIFLUENT <onboarding@resend.dev>";
+  const html = `
+    <h2>${SUBJECT}</h2>
+    <p><strong>Nome:</strong> ${escapeHtml(lead.nome)}</p>
+    <p><strong>Empresa:</strong> ${escapeHtml(lead.empresa) || "—"}</p>
+    <p><strong>E-mail:</strong> ${escapeHtml(lead.email)}</p>
+    <p><strong>Telefone:</strong> ${escapeHtml(lead.telefone) || "—"}</p>
+    <p><strong>Mensagem:</strong><br/>${escapeHtml(lead.mensagem).replace(/\n/g, "<br/>")}</p>
+    <p><strong>Data e hora:</strong> ${escapeHtml(lead.dataHora)}</p>`;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [site.contact.email],
+        reply_to: lead.email,
+        subject: SUBJECT,
+        html,
+      }),
+    });
+    if (!res.ok) console.error("contato.resend_http", res.status);
+    return res.ok;
+  } catch (err) {
+    console.error("contato.resend_err", err);
+    return false;
+  }
+}
+
+async function sendViaFormSubmit(lead: Lead): Promise<boolean> {
+  const endpoint = `https://formsubmit.co/ajax/${encodeURIComponent(site.contact.email)}`;
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        Nome: lead.nome,
+        Empresa: lead.empresa || "—",
+        Email: lead.email,
+        Telefone: lead.telefone || "—",
+        Mensagem: lead.mensagem,
+        "Data e hora": lead.dataHora,
+        _subject: SUBJECT,
+        _replyto: lead.email,
+        _template: "table",
+        _captcha: "false",
+      }),
+    });
+    if (!res.ok) {
+      console.error("contato.formsubmit_http", res.status);
+      return false;
+    }
+    const json = (await res.json().catch(() => ({}))) as { success?: string };
+    return json.success === "true";
+  } catch (err) {
+    console.error("contato.formsubmit_err", err);
+    return false;
+  }
 }
 
 export async function POST(request: Request) {
@@ -37,16 +115,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
   }
 
-  // Honeypot preenchido => provável bot. Responde 200 sem processar.
-  if (body.website) {
-    return NextResponse.json({ ok: true });
-  }
+  if (body.website) return NextResponse.json({ ok: true }); // honeypot
 
   const nome = body.nome?.trim();
   const email = body.email?.trim();
   const mensagem = body.mensagem?.trim();
-  const empresa = body.empresa?.trim() ?? "";
-  const telefone = body.telefone?.trim() ?? "";
 
   if (!nome || !email || !mensagem) {
     return NextResponse.json(
@@ -64,45 +137,29 @@ export async function POST(request: Request) {
     );
   }
 
-  const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_INBOX ?? site.contact.email;
-  // Remetente: precisa ser um domínio verificado no Resend. Configurável por env.
-  const from = process.env.CONTACT_FROM ?? "AIFLUENT <contato@aifluent.com.br>";
+  const lead: Lead = {
+    nome,
+    email,
+    mensagem,
+    empresa: body.empresa?.trim() ?? "",
+    telefone: body.telefone?.trim() ?? "",
+    dataHora: new Date().toLocaleString("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      dateStyle: "short",
+      timeStyle: "short",
+    }),
+  };
 
-  if (!apiKey) {
-    // Sem chave configurada: não falha o formulário, apenas registra.
-    console.warn("contato.sem_resend_key", { nome, email, empresa });
-    return NextResponse.json({ ok: true, delivered: false });
-  }
-
-  try {
-    const resend = new Resend(apiKey);
-    const html = `
-      <h2>Novo contato — ${escapeHtml(site.name)}</h2>
-      <p><strong>Nome:</strong> ${escapeHtml(nome)}</p>
-      <p><strong>Empresa:</strong> ${escapeHtml(empresa) || "—"}</p>
-      <p><strong>E-mail:</strong> ${escapeHtml(email)}</p>
-      <p><strong>Telefone:</strong> ${escapeHtml(telefone) || "—"}</p>
-      <p><strong>Mensagem:</strong></p>
-      <p>${escapeHtml(mensagem).replace(/\n/g, "<br/>")}</p>
-    `;
-
-    const { error } = await resend.emails.send({
-      from,
-      to: [to],
-      replyTo: email,
-      subject: `Novo contato de ${nome}${empresa ? ` (${empresa})` : ""}`,
-      html,
+  // Tenta Resend primeiro (se configurado); senão FormSubmit.
+  const delivered =
+    (await sendViaResend(lead)) || (await sendViaFormSubmit(lead));
+  if (!delivered) {
+    console.warn("contato.email_indisponivel", {
+      email: lead.email,
+      dataHora: lead.dataHora,
     });
-
-    if (error) {
-      console.error("contato.resend_error", error);
-      return NextResponse.json({ error: "Falha ao enviar." }, { status: 502 });
-    }
-
-    return NextResponse.json({ ok: true, delivered: true });
-  } catch (err) {
-    console.error("contato.exception", err);
-    return NextResponse.json({ error: "Erro interno." }, { status: 500 });
   }
+
+  // Sempre ok: o cliente abre o WhatsApp com os dados (canal garantido).
+  return NextResponse.json({ ok: true, delivered });
 }

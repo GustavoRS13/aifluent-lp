@@ -23,7 +23,6 @@ export default function Home() {
     description: site.description,
     email: site.contact.email,
     areaServed: "BR",
-    sameAs: [site.social.linkedin],
     knowsAbout: [
       "Inteligência Artificial",
       "Automação de Processos",
