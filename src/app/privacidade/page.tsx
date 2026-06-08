@@ -82,7 +82,7 @@ export default function PrivacidadePage() {
           para{" "}
           <a
             href={`mailto:${site.legal.dpoEmail}`}
-            className="font-medium text-brand-blue underline underline-offset-2"
+            className="font-medium text-brand-link underline underline-offset-2"
           >
             {site.legal.dpoEmail}
           </a>

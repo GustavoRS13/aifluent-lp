@@ -51,7 +51,7 @@ export function CookieConsent() {
           continuar, você concorda com a nossa{" "}
           <Link
             href="/privacidade"
-            className="font-medium text-brand-blue underline underline-offset-2"
+            className="font-medium text-brand-link underline underline-offset-2"
           >
             Política de Privacidade
           </Link>{" "}

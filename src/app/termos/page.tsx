@@ -59,7 +59,7 @@ export default function TermosPage() {
           Os dados informados no formulário são tratados conforme a nossa{" "}
           <a
             href="/privacidade"
-            className="font-medium text-brand-blue underline underline-offset-2"
+            className="font-medium text-brand-link underline underline-offset-2"
           >
             Política de Privacidade
           </a>{" "}
@@ -95,7 +95,7 @@ export default function TermosPage() {
           Dúvidas sobre estes Termos podem ser enviadas para{" "}
           <a
             href={`mailto:${site.contact.email}`}
-            className="font-medium text-brand-blue underline underline-offset-2"
+            className="font-medium text-brand-link underline underline-offset-2"
           >
             {site.contact.email}
           </a>

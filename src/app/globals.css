@@ -12,6 +12,8 @@
   --color-brand-indigo: #6366f1;
   --color-brand-violet: #a855f7;
   --color-brand-fuchsia: #c026d3;
+  /* Azul mais escuro para links de texto sobre fundo claro (contraste AA ≥ 4.5) */
+  --color-brand-link: #3a5fd9;
 
   --color-ink: #0b1020;
   --color-ink-soft: #1a2138;

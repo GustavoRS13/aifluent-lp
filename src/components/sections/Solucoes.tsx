@@ -77,7 +77,7 @@ export function Solucoes() {
                   </p>
                   <a
                     href="#contato"
-                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-blue transition-colors hover:text-brand-violet"
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-link transition-colors hover:text-brand-violet"
                   >
                     Saiba mais
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
