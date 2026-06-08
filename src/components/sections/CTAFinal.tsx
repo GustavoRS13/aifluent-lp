@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/motion/Reveal";
+import { whatsappUrl } from "@/lib/site";
 
 export function CTAFinal() {
   return (
@@ -28,7 +29,13 @@ export function CTAFinal() {
                 variant="brandOutline"
                 size="xl"
                 className="border-white/20 bg-white/5 text-white hover:bg-white/10"
-                render={<a href="#contato" />}
+                render={
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
               >
                 Falar com especialista
               </Button>

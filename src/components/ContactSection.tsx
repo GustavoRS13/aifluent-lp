@@ -2,15 +2,46 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Mail, MapPin } from "lucide-react";
-import { LinkedinIcon } from "@/components/icons/LinkedinIcon";
+import { Check, Mail, MessageCircle, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { site } from "@/lib/site";
+import { LinkedinIcon } from "@/components/icons/LinkedinIcon";
+import { site, whatsappUrl } from "@/lib/site";
 
 type Status = "idle" | "loading" | "success" | "error";
+
+const canais = [
+  {
+    icon: MessageCircle,
+    label: "WhatsApp",
+    value: site.contact.whatsappLabel,
+    href: whatsappUrl,
+    external: true,
+  },
+  {
+    icon: CalendarClock,
+    label: "Agendar reunião",
+    value: "Calendly",
+    href: site.contact.calendly,
+    external: true,
+  },
+  {
+    icon: Mail,
+    label: "E-mail",
+    value: site.contact.email,
+    href: `mailto:${site.contact.email}`,
+    external: false,
+  },
+  {
+    icon: LinkedinIcon,
+    label: "LinkedIn",
+    value: "/company/aifluent",
+    href: site.social.linkedin,
+    external: true,
+  },
+];
 
 export function ContactSection() {
   const [status, setStatus] = useState<Status>("idle");
@@ -21,8 +52,7 @@ export function ContactSection() {
     const form = e.currentTarget;
     const data = Object.fromEntries(new FormData(form).entries());
 
-    // Honeypot anti-spam: campo oculto preenchido = bot.
-    if (data.website) return;
+    if (data.website) return; // honeypot
 
     if (!data.consent) {
       setStatus("error");
@@ -52,59 +82,55 @@ export function ContactSection() {
   }
 
   return (
-    <section
-      id="contato"
-      className="hero-mesh relative overflow-hidden text-white"
-    >
-      <div className="absolute inset-0 bg-grid-dark opacity-50" aria-hidden />
-      <div className="relative mx-auto grid max-w-6xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8">
+    <section id="contato" className="border-t border-border bg-white py-24">
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
         <div>
-          <span className="text-sm font-semibold uppercase tracking-wider text-brand-cyan">
+          <span className="brand-gradient-text text-sm font-semibold uppercase tracking-wider">
             Contato
           </span>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-balance text-ink sm:text-4xl">
             Vamos conversar sobre o seu projeto
           </h2>
-          <p className="mt-4 max-w-md text-base leading-relaxed text-white/70">
-            Conte o seu desafio. Nosso time retorna com uma proposta de IA,
-            automação, integração ou desenvolvimento sob medida.
+          <p className="mt-4 max-w-md text-base leading-relaxed text-muted-foreground">
+            Escolha o canal de sua preferência ou envie uma mensagem. Nosso time
+            retorna com uma proposta de IA, automação, integração ou
+            desenvolvimento sob medida.
           </p>
 
-          <ul className="mt-8 space-y-5 text-sm">
-            <li className="flex items-center gap-3">
-              <Mail className="size-5 text-brand-cyan" />
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
+            {canais.map((c) => (
               <a
-                href={`mailto:${site.contact.email}`}
-                className="font-medium hover:text-brand-cyan"
+                key={c.label}
+                href={c.href}
+                target={c.external ? "_blank" : undefined}
+                rel={c.external ? "noopener noreferrer" : undefined}
+                className="group flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-brand-blue/40 hover:shadow-sm"
               >
-                {site.contact.email}
+                <span className="brand-gradient inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-white">
+                  <c.icon className="size-5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-ink">
+                    {c.label}
+                  </span>
+                  <span className="block truncate text-sm text-muted-foreground">
+                    {c.value}
+                  </span>
+                </span>
               </a>
-            </li>
-            <li className="flex items-center gap-3">
-              <MapPin className="size-5 text-brand-cyan" />
-              <span className="font-medium">{site.contact.address}</span>
-            </li>
-            <li className="flex items-center gap-3">
-              <LinkedinIcon className="size-5 text-brand-cyan" />
-              <a
-                href={site.social.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium hover:text-brand-cyan"
-              >
-                LinkedIn
-              </a>
-            </li>
-          </ul>
+            ))}
+          </div>
         </div>
 
-        <div className="card-ring rounded-2xl border border-white/10 bg-white p-6 text-ink sm:p-8">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
           {status === "success" ? (
-            <div className="flex h-full min-h-[22rem] flex-col items-center justify-center text-center">
+            <div className="flex h-full min-h-[24rem] flex-col items-center justify-center text-center">
               <div className="brand-gradient flex size-14 items-center justify-center rounded-full text-white">
                 <Check className="size-7" />
               </div>
-              <h3 className="mt-5 text-xl font-semibold">Mensagem enviada!</h3>
+              <h3 className="mt-5 text-xl font-semibold text-ink">
+                Mensagem enviada!
+              </h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 Obrigado pelo contato. Retornaremos em breve.
               </p>
